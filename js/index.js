@@ -9,7 +9,7 @@ var CONST = {
 		d: { x: -1, y: 0 }
 	}
 }
-
+// 保存当前玩家位置和方向数据
 var player = {
 	direction: 'w',
 	position: {
@@ -19,6 +19,7 @@ var player = {
 	hasFirstArea: false,
 }
 
+// 计算玩家位置、方向、区域等
 var controller = {
 	direction: 's',
 	position: {
@@ -26,30 +27,78 @@ var controller = {
 		y: 0
 	},
 	path: [{x:0,y:0,z:0.01}],
-	area: [],
+	areas: [],
+	addArea(points) {
+		// 加入区域
+		var area = {
+			points,
+			mesh: null
+		}
+		// todo 判断是否和其它区域有交集,如果有则合并
+		this.areas.push(area);
+	},
+	drawArea(){
+		const newAreas = this.areas.filter(function(area){ return area.mesh === null; });
+		newAreas.forEach(function(area) {
+			var shape = new THREE.Shape();
+			area.points.forEach(function(point, index) {
+				index === 0 ? shape.moveTo(point.x, point.y) : shape.lineTo(point.x, point.y)
+			})
+			var geometry = new THREE.ShapeGeometry( shape );
+			var material = new THREE.MeshBasicMaterial( { color: 0xFFE69A } );
+			area.mesh = new THREE.Mesh( geometry, material ) ;
+			area.mesh.position = { x: 0, y: 0, z: 0.01 }
+			scene.add(area.mesh);
+		})
+	},
 	calculate() {
+		// 用户运动方向判断
 		var sameDir = player.direction === this.direction;
+		// 计算是否有一格的距离
 		var distance = Math.sqrt(Math.pow(player.position.x - this.position.x, 2) + Math.pow(player.position.y - this.position.y, 2))
+		// 如果距离大于1,进行相关逻辑计算
 		if(distance>=1) {
+			// 更新用户位置
 			player.position = { x: Math.round(this.position.x), y: Math.round(this.position.y) }
+			// 如果当前用户方向与之前方向不一致,则变向
 			if(!sameDir) {
 				player.direction = this.direction;
+				// 坐标可能有误差,重置位置
 				this.position = { x: player.position.x, y: player.position.y };
 			}
-
+			// 在行驶路径中查找是否有该点
 			var findIndex = this.path.findIndex(function(item) {
 				return item.x === player.position.x && item.y === player.position.y;
 			})
-
+			
 			if(findIndex!==-1) {
-				this.path.splice(findIndex+1, this.path.length - findIndex);
+				// 如果查找到
+				const deleteArea = this.path.splice(findIndex+1, this.path.length - findIndex);
+				deleteArea.push({
+					x: player.position.x,
+					y: player.position.y,
+					z: 0.01
+				});
+				if(deleteArea.length>=4) {
+					// 如果刚好围成区域,则新建区域
+					// todo 生成动画或者播放声音
+					this.addArea(deleteArea);
+					// 重置路径
+					this.path = [{
+						x: player.position.x,
+						y: player.position.y,
+						z: 0.01
+					}];
+				}
 			} else {
+				// 如果未查找到
 				this.path.push({
 					x: player.position.x,
 					y: player.position.y,
 					z: 0.01
 				})
 			}
+
 			console.log(player.position, this.path);
 			// 计算线路是否闭合为区域
 
@@ -67,7 +116,7 @@ var controller = {
 		this.position.x = obj.position.x;
 		this.position.y = obj.position.y;
 	},
-	applyPath() {
+	drawPath() {
 		if(this.path.length>1) {
 			if(!pathMesh) {
 				pathMesh = new THREE.LineSegments( pathGeometry(this.path), new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 0.3, gapSize: 0.1, linewidth: 2 } ) );
@@ -77,8 +126,10 @@ var controller = {
 				pathMesh.geometry = pathGeometry(this.path);
 				pathMesh.computeLineDistances();
 			}
-		} 
-		
+			pathMesh.visible = true;
+		} else {
+			if(pathMesh) pathMesh.visible = false;
+		}
 	}
 }
 
@@ -143,7 +194,8 @@ function animate() {
 	// 更新绘制
 	controller.apply(camera);
 	controller.apply(mesh);
-	controller.applyPath(pathMesh, scene);
+	controller.drawPath();
+	controller.drawArea()
 
 	// 计算怪物位置
 
