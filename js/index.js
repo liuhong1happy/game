@@ -7,8 +7,12 @@ var CONST = {
 		s: { x: 0, y: -1 },
 		a: { x: 1, y: 0 },
 		d: { x: -1, y: 0 }
-	}
+	},
+	gridCount: 200,
+	enemyV: 0.005,
+	palyerV: 0.009,
 }
+
 // 保存当前玩家位置和方向数据
 var player = {
 	direction: 'w',
@@ -20,7 +24,7 @@ var player = {
 }
 
 // 计算玩家位置、方向、区域等
-var controller = {
+var playerController = {
 	direction: 's',
 	position: {
 		x: 0,
@@ -195,8 +199,190 @@ var controller = {
 		} else {
 			if(pathMesh) pathMesh.visible = false;
 		}
+	},
+	// 判断某一点是否可以生成怪物
+	outBlock(position) {
+		return this.blocks.filter(function(block) {
+			return (block.point1.x === position.x && block.point1.y === position.y) || (block.point3.x === position.x && block.point3.y === position.y)
+		}).length === 0;
+	},
+	// 计算位置到玩家的距离
+	distance(position) {
+		return Math.sqrt(Math.pow(this.position.x - position.x, 2) + Math.pow(this.position.y - position.y, 2))
+	},
+	outPath(position) {
+		return this.path.filter(function(point) {
+			return (point.x === position.x && point.y === position.y)
+		}).length === 0;
 	}
 }
+
+// 记录所有敌人
+var enemyController = {
+	max: 20, // 敌人数量最多100个
+	born: 1*1000, // 1s 诞生一个敌人
+	timestamp: Date.now(),
+	enemies: [ // 记录当前所有敌人
+		{
+			typeId: 1, // 预留字段,怪物类型
+			direction: 'd',
+			position: {
+				x: 10,
+				y: 10
+			},
+			targetPosition: {
+				x: 11,
+				y: 10
+			},
+			prevPosition: {
+				x: 10,
+				y: 10
+			},
+			mesh: null
+		}
+	], 
+	random(direction) {
+		var dirDic = {
+			'w': ['w','a','d'],
+			's': ['s','d','a'],
+			'a': ['a','s','w'],
+			'd': ['d','w','s'],
+		}
+		// 随机构建用户操作
+		var rdmInt = Math.round(Math.random()*1000)%3;
+		var dir = dirDic[direction][rdmInt];
+		return dir;
+	},
+	createEnemy(pos) {
+		var rdmInt = Math.round(Math.random()*1000)%4;
+		var direction = ['w','s','a','d'][rdmInt];
+		var dir = CONST.direction[direction];
+		var newEnemy = {
+			typeId: 1,
+			position: {
+				x: pos.x,
+				y: pos.y
+			},
+			targetPosition: {
+				x: pos.x+dir.x,
+				y: pos.y+dir.y
+			},
+			prevPosition: {
+				x: pos.x,
+				y: pos.y
+			},
+			direction: direction,
+			mesh: null
+		}
+		return newEnemy;
+	},
+	calculate() {
+		// 随机计算生成敌人的位置
+		if((Date.now() - this.timestamp)>= this.born && this.enemies.length <= this.max) {
+			this.timestamp = Date.now();
+			var x = Math.round(Math.random()* CONST.gridCount) % CONST.gridCount - CONST.gridCount/2;
+			var y = Math.round(Math.random()* CONST.gridCount) % CONST.gridCount - CONST.gridCount/2;
+			var pos = { x: x, y: y };
+			var distance = playerController.distance(pos);
+
+			// 落到玩家的区域内、玩家行驶路线上
+			if(playerController.outPath(pos) && 
+				playerController.outBlock(pos) && 
+				this.outEnemy(pos) && 
+				distance>3 && distance <= 30
+			) {
+				var newEnemy = this.createEnemy(pos);
+				this.enemies.push(newEnemy);
+			}
+		}
+		
+		// 计算敌人的下一目的地
+		var that = this;
+		this.enemies.forEach(function(enemy) {
+			var enemyPos = new THREE.Vector2( enemy.position.x, enemy.position.y );
+			var targetPos = new THREE.Vector2( enemy.targetPosition.x, enemy.targetPosition.y );
+			var prevPos = new THREE.Vector2( enemy.prevPosition.x, enemy.prevPosition.y );
+			var distance = enemyPos.distanceTo(targetPos);
+			if(distance<= 0.01) {
+				var direction = that.random(enemy.direction);
+				var dir = CONST.direction[direction];
+				var pos = { x: targetPos.x + dir.x, y: targetPos.y + dir.y }
+				// 更新现有位置
+				enemy.position = { x: targetPos.x, y: targetPos.y }
+				// 重新规划下一个目的地
+				if(playerController.outBlock(pos) && 
+					distance>3 && distance <= 50
+				) {
+					enemy.prevPosition = { x: targetPos.x, y: targetPos.y };
+					enemy.targetPosition = pos;
+					enemy.direction = direction;
+				} else {
+					var dirDic = {
+						'w': 's',
+						's': 'w',
+						'a': 'd',
+						'd': 'a',
+					}
+					enemy.prevPosition = { x: targetPos.x, y: targetPos.y };
+					enemy.targetPosition = { x: prevPos.x, y: prevPos.y };
+					enemy.direction = dirDic[enemy.direction];
+				}
+			} else {
+				enemy.position = { x: enemyPos.x + (targetPos.x - enemyPos.x)*CONST.enemyV, y: enemyPos.y + (targetPos.y - enemyPos.y)*CONST.enemyV }
+			}
+		})
+	},
+	drawEnemies() {
+		// 获取新的敌人
+		// 更新敌人位置
+		var newEnemies = this.enemies.filter(function(enemy) {
+			var isNew = enemy.mesh === null;
+			if(!isNew) {
+				enemy.mesh.position.x = enemy.position.x;
+				enemy.mesh.position.y = enemy.position.y;
+			}
+			return isNew;
+		})
+
+		// 生成新的敌人
+		newEnemies.forEach(function(enemy) {
+			var geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+			var material = new THREE.MeshBasicMaterial({ color: '#99ff00', wireframe: true });
+			
+			var mesh = new THREE.Mesh( geometry, material );
+			mesh.position.x = enemy.position.x;
+			mesh.position.y = enemy.position.y;
+			mesh.position.z = 0.1;
+			enemy.mesh = mesh;
+			scene.add(enemy.mesh);
+		})
+		
+	},
+	// 判断某一点是否有怪物活动
+	outEnemy(position) {
+		return this.enemies.filter(function(enemy) { return enemy.targetPosition.x === position.x && enemy.targetPosition.y === position.y }).length===0
+	}
+}
+
+var uiController = {
+	dom: document.createElement('div'),
+	init() {
+		this.dom.style.position = 'absolute';
+		this.dom.style.top = 0;
+		this.dom.style.right = 0;
+		this.dom.style.padding = '10px';
+		this.dom.style.backgroundColor = 'rgba(255,255,255,0.3)';
+		this.dom.style.color = 'rgb(255,255,255)';
+		document.body.appendChild(this.dom);
+	},
+	update() {
+		this.dom.innerText = [
+			'敌人数量:'+ enemyController.enemies.length+'个',
+			'圈地数量:'+ playerController.blocks.length+'格',
+		].join('\n');
+	}
+}
+
 
 init();
 animate();
@@ -228,7 +414,7 @@ function init() {
 
 	scene = new THREE.Scene();
 
-	var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
+	var grid = new THREE.GridHelper( CONST.gridCount, CONST.gridCount, 0xffffff, 0x555555 );
 	grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
 	scene.add( grid );
 
@@ -244,26 +430,32 @@ function init() {
 	document.body.appendChild( renderer.domElement );
 
 	window.addEventListener( 'resize', onWindowResize, false );
+
+	uiController.init();
 }
 
 function animate() {
 	requestAnimationFrame( animate );
 
 	var dir = CONST.direction[player.direction];
-	mesh.position.x += dir.x*0.007;
-	mesh.position.y += dir.y*0.007;
+	mesh.position.x += dir.x* CONST.palyerV;
+	mesh.position.y += dir.y* CONST.palyerV;
 	// 根据物体位置，更新控制器坐标
-	controller.update(mesh);
+	playerController.update(mesh);
 	// 相关计算
-	controller.calculate();
+	playerController.calculate();
 	// 更新绘制
-	controller.applyMesh(mesh);
-	controller.applyCamera(camera);
-	controller.drawPath();
-	controller.drawArea()
+	playerController.applyMesh(mesh);
+	playerController.applyCamera(camera);
+	playerController.drawPath();
+	playerController.drawArea()
 
 	// 计算怪物位置
+	enemyController.calculate();
+	enemyController.drawEnemies();
 
+	// 更新ui
+	uiController.update();
 	// 碰撞检测
 
 	renderer.render( scene, camera );
