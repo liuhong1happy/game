@@ -27,14 +27,62 @@ var controller = {
 		y: 0
 	},
 	path: [{x:0,y:0,z:0.01}],
-	areas: [],
+	areas: [], // 所有围成的区域
+	blocks: [],
+	addBlocks(blocks) {
+		var canInsertBlocks = [];
+		this.blocks.forEach(function(oldBlock) {
+			var index = blocks.findIndex(function(newBlock) { return newBlock.point1.x === oldBlock.point1.x && newBlock.point1.y === oldBlock.point1.y });
+			if(index!==-1) blocks.splice(index, 1);
+		})
+		this.blocks = this.blocks.concat(blocks);
+		console.log('this.blocks', this.blocks);
+	},
 	addArea(points) {
 		// 加入区域
 		var area = {
 			points,
 			mesh: null
 		}
-		// todo 判断是否和其它区域有交集,如果有则合并
+		// 计算新增区域中的所有格子数量
+		// 1. 计算区域范围
+		var firstPoint = area.points[0];
+		var maxX = firstPoint.x, maxY = firstPoint.y, minX = firstPoint.x, minY = firstPoint.y;
+		area.points.forEach(function(point) {
+			if(point.x>maxX) maxX = point.x;
+			if(point.y>maxY) maxY = point.y;
+			if(point.x<minX) minX = point.x;
+			if(point.y<minY) minY = point.y;
+		})
+		// 2. 计算相交数,奇数次相交则在区域内
+		var blocks = [];
+		var pCount = area.points.length;
+		for(x=minX;x<=maxX;x++) {
+			var intCount = -1;
+			for(y=maxY;y>minY;y--) {
+				var block = {
+					point1: {x: x, y: y },
+					point2: {x: x+1, y: y },
+					point3: {x: x+1, y: y+1 },
+					point4: {x: x, y: y+1 },
+					mesh: null
+				}
+				var samePoints = area.points.filter(function(p, index) {
+					var prevPoint = area.points[(pCount+index-1)%pCount];
+					var nextPoint = area.points[(pCount+index+1)%pCount];
+					return (block.point1.x === p.x && block.point1.y === p.y) && ((block.point2.x === prevPoint.x && block.point2.y===prevPoint.y) || (block.point2.x === nextPoint.x && block.point2.y===nextPoint.y))
+				})
+				if(samePoints.length===1) {
+					// 表示和块中心点相交
+					intCount = intCount+1;
+				}
+				if(intCount%2===0) {
+					blocks.push(block);
+				}
+			}
+		}
+		console.log('blocks', blocks);
+		this.addBlocks(blocks);
 		this.areas.push(area);
 	},
 	drawArea(){
@@ -52,12 +100,14 @@ var controller = {
 		})
 	},
 	calculate() {
-		// 用户运动方向判断
-		var sameDir = player.direction === this.direction;
 		// 计算是否有一格的距离
 		var distance = Math.sqrt(Math.pow(player.position.x - this.position.x, 2) + Math.pow(player.position.y - this.position.y, 2))
 		// 如果距离大于1,进行相关逻辑计算
 		if(distance>=1) {
+			// 随机用户方向
+			this.random();
+			// 用户运动方向判断
+			var sameDir = player.direction === this.direction;
 			// 更新用户位置
 			player.position = { x: Math.round(this.position.x), y: Math.round(this.position.y) }
 			// 如果当前用户方向与之前方向不一致,则变向
@@ -105,8 +155,16 @@ var controller = {
 		}
 	},
 	random() {
-		var dir = ['w', 's', 'a', 'd'][parseInt(Math.random()*4)%4];
-		controller.direction = dir;
+		var dirDic = {
+			'w': ['w','a','d'],
+			's': ['s','d','a'],
+			'a': ['a','s','w'],
+			'd': ['d','w','s'],
+		}
+		// 随机构建用户操作
+		var rdmInt = Math.round(Math.random()*1000)%3;
+		var dir = dirDic[this.direction][rdmInt];
+		this.direction = dir;
 	},
 	apply(obj) {
 		obj.position.x = this.position.x;
@@ -185,9 +243,6 @@ function animate() {
 	mesh.position.y += dir.y*0.007;
 	// 根据物体位置，更新控制器坐标
 	controller.update(mesh);
-
-	// 测试，随机控制方向
-	controller.random();
 	// 相关计算
 	controller.calculate();
 
