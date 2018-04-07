@@ -95,7 +95,7 @@ var controller = {
 			var geometry = new THREE.ShapeGeometry( shape );
 			var material = new THREE.MeshBasicMaterial( { color: 0xFFE69A } );
 			area.mesh = new THREE.Mesh( geometry, material ) ;
-			area.mesh.position = { x: 0, y: 0, z: 0.01 }
+			area.mesh.position = { x: 0, y: 0, z: 0.02 }
 			scene.add(area.mesh);
 		})
 	},
@@ -166,9 +166,16 @@ var controller = {
 		var dir = dirDic[this.direction][rdmInt];
 		this.direction = dir;
 	},
-	apply(obj) {
+	applyMesh(obj) {
 		obj.position.x = this.position.x;
 		obj.position.y = this.position.y;
+	},
+	applyCamera(camera) {
+		camera.position.x = this.position.x-10;
+		camera.position.y = this.position.y-10;
+		camera.position.z = 10*Math.sqrt(3)/2;
+		camera.up = new THREE.Vector3(0.5, 0.5, 0)
+		camera.lookAt( this.position.x, this.position.y, 0 );
 	},
 	update(obj) {
 		this.position.x = obj.position.x;
@@ -209,10 +216,14 @@ function pathGeometry(path) {
 	return geometry;
 }
 
-
 function init() {
 
-	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+	
+	var aspect = window.innerWidth / window.innerHeight;
+	var width = 10*aspect, height = 10;
+
+	// camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+	camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 100 );
 	camera.position.z = 10;
 
 	scene = new THREE.Scene();
@@ -225,8 +236,8 @@ function init() {
 	material = new THREE.MeshNormalMaterial();
 
 	mesh = new THREE.Mesh( geometry, material );
-	scene.add( mesh );
-
+	mesh.position.z = 0.1;
+	scene.add(mesh);
 
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -245,10 +256,9 @@ function animate() {
 	controller.update(mesh);
 	// 相关计算
 	controller.calculate();
-
 	// 更新绘制
-	controller.apply(camera);
-	controller.apply(mesh);
+	controller.applyMesh(mesh);
+	controller.applyCamera(camera);
 	controller.drawPath();
 	controller.drawArea()
 
