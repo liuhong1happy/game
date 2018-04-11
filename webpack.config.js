@@ -6,7 +6,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var DashboardPlugin = require('webpack-dashboard/plugin');
 
 var APP_PATH = path.resolve(__dirname,'./src/index.js');
-var BUILD_PATH = path.resolve(__dirname, './build');
+var BUILD_PATH = path.resolve(__dirname, './docs');
 var TMP_PATH = path.resolve(__dirname,'./src/index.html');
 
 module.exports = {
