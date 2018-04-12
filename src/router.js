@@ -6,6 +6,7 @@ import PlayScene from './scenes/play'
 import * as THREE from 'three';
 import Scene from './scenes/scene';
 
+// 路由配置
 const scenes = {
     '/home': new HomeScene(),
     '/loading': new LoadingScene(),

@@ -10,7 +10,7 @@ var BUILD_PATH = path.resolve(__dirname, './docs');
 var TMP_PATH = path.resolve(__dirname,'./src/index.html');
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   entry: APP_PATH,
   output: {
     path: BUILD_PATH,

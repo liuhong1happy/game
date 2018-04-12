@@ -6,6 +6,7 @@ import Scene from '../scene'
 import DebugUIController from '../../scripts/controllers/DebugUIController';
 import PlayerController from '../../scripts/controllers/PlayerController';
 import EnemyController from '../../scripts/controllers/EnemyController';
+import GestureController from '../../scripts/controllers/GestureController';
 
 export default class PlayScene extends Scene {
     Start() {
@@ -15,11 +16,14 @@ export default class PlayScene extends Scene {
         this.camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 100 );
         this.camera.position.z = 10;
         // 初始化控制器
-        this.playerController = new PlayerController(this.scene, this.camera);
-        this.enemyController = new EnemyController(this.scene, this.camera, this.playerController);
-        this.uiController = new DebugUIController(this.playerController, this.enemyController);
+        this.gestureController = new GestureController(); // 手势控制器
+        this.playerController = new PlayerController(this.scene, this.camera, this.gestureController); // 玩家控制器
+        this.enemyController = new EnemyController(this.scene, this.camera, this.playerController); // 敌人控制器
+        this.uiController = new DebugUIController(this.playerController, this.enemyController,  this.gestureController); // 调试界面显示
+
         this.playerController.init();
         this.uiController.init();
+        this.gestureController.init();
     }
     Update() {
         // 根据物体位置，更新控制器坐标
@@ -42,6 +46,6 @@ export default class PlayScene extends Scene {
 
     }
     End() {
-        
+        this.gestureController.unload();
     }
 }

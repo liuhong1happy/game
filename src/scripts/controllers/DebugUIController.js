@@ -1,8 +1,19 @@
+import player from '../models/player'
+
+const Dirs = {
+	'w': '北',
+	'd': '东',
+	'a': '西',
+	's': '南',
+	'c': '保持当前方向'
+}
+
 export default class DebugUIController {
-    dom =  document.createElement('div');
-    constructor(playerController, enemyController) {
+    constructor(playerController, enemyController, gestureController) {
         this.enemyController = enemyController;
-        this.playerController = playerController;
+		this.playerController = playerController;
+		this.gestureController = gestureController;
+		this.dom =  document.createElement('div');
     }
 	init() {
 		this.dom.style.position = 'absolute';
@@ -17,6 +28,8 @@ export default class DebugUIController {
 		this.dom.innerText = [
 			'敌人数量:'+ this.enemyController.enemies.length+'个',
 			'圈地数量:'+ this.playerController.blocks.length+'格',
+			'当前行驶方向:' + Dirs[player.direction],
+			'准备切换方向:' + Dirs[this.gestureController.direction]
 		].join('\n');
 	}
 }

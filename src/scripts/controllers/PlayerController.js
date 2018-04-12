@@ -20,12 +20,13 @@ function pathGeometry(path) {
 
 // 计算玩家位置、方向、区域等
 export default class PlayerController {    
-    constructor(scene, camera) {
+    constructor(scene, camera, gesture) {
         this.scene = scene;
-        this.camera = camera;
+		this.camera = camera;
+		this.gesture = gesture;
     }
 
-    direction = 's';
+    direction = 'w';
 	position = {
 		x: 0,
 		y: 0
@@ -104,7 +105,7 @@ export default class PlayerController {
 	}
 	drawArea(){
 		const newAreas = this.areas.filter(function(area){ return area.mesh === null; });
-		newAreas.forEach(function(area) {
+		newAreas.forEach((area) => {
 			var shape = new THREE.Shape();
 			area.points.forEach(function(point, index) {
 				index === 0 ? shape.moveTo(point.x, point.y) : shape.lineTo(point.x, point.y)
@@ -112,7 +113,7 @@ export default class PlayerController {
 			var geometry = new THREE.ShapeGeometry( shape );
 			var material = new THREE.MeshBasicMaterial( { color: 0xFFE69A } );
 			area.mesh = new THREE.Mesh( geometry, material ) ;
-			area.mesh.position = { x: 0, y: 0, z: 0.02 }
+			area.mesh.position.set(0,0,0.02);
 			this.scene.add(area.mesh);
 		})
 	}
@@ -122,7 +123,9 @@ export default class PlayerController {
 		// 如果距离大于1,进行相关逻辑计算
 		if(distance>=1) {
 			// 随机用户方向
-			this.random();
+			// this.random();
+			// 手势控制方向
+			this.gestureDirection();
 			// 用户运动方向判断
 			var sameDir = player.direction === this.direction;
 			// 更新用户位置
@@ -182,6 +185,12 @@ export default class PlayerController {
 		var rdmInt = Math.round(Math.random()*1000)%3;
 		var dir = dirDic[this.direction][rdmInt];
 		this.direction = dir;
+	}
+	gestureDirection() {
+		if(this.gesture.direction !== 'c') {
+			this.direction = this.gesture.direction;
+			this.gesture.direction = 'c';
+		}
 	}
 	applyMesh() {
 		this.mesh.position.x = this.position.x;
