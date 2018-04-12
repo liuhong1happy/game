@@ -10,7 +10,6 @@ var BUILD_PATH = path.resolve(__dirname, './docs');
 var TMP_PATH = path.resolve(__dirname,'./src/index.html');
 
 module.exports = {
-  mode: 'development',
   entry: APP_PATH,
   output: {
     path: BUILD_PATH,
@@ -18,6 +17,9 @@ module.exports = {
   },
   optimization: {
     minimize: true,
+    runtimeChunk: {
+      name: "manifest"
+    },
     splitChunks: {
       chunks: "async",
       minSize: 300000,
@@ -29,7 +31,9 @@ module.exports = {
       cacheGroups: {
           vendors: {
               test: /[\\/]node_modules[\\/]/,
-              priority: -10
+              priority: -10,
+              name: "vendor",
+              chunks: 'initial'
           },
           default: {
               minChunks: 2,
