@@ -41,10 +41,10 @@ export default class PlayerController {
         grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
         this.scene.add( grid );
         // 初始化玩家mesh
-        var geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+        var geometry = new THREE.BoxGeometry( CONST.playerSize, CONST.playerSize, CONST.playerSize );
         var material = new THREE.MeshNormalMaterial();
         this.mesh = new THREE.Mesh( geometry, material );
-        this.mesh.position.z = 0.1;
+        this.mesh.position.z = CONST.playerSize / 2;
         this.scene.add(this.mesh);
     }
 	addBlocks(blocks) {
@@ -197,16 +197,16 @@ export default class PlayerController {
 		this.mesh.position.y = this.position.y;
 	}
 	applyCamera() {
-		this.camera.position.x = this.position.x-10;
-		this.camera.position.y = this.position.y-10;
-		this.camera.position.z = 10*Math.sqrt(3)/2;
+		this.camera.position.x = this.position.x-15;
+		this.camera.position.y = this.position.y-15;
+		this.camera.position.z = 15*Math.sqrt(3)/2;
 		this.camera.up = new THREE.Vector3(0.5, 0.5, 0)
 		this.camera.lookAt( this.position.x, this.position.y, 0 );
 	}
 	update() {
         var dir = CONST.direction[player.direction];
-        this.mesh.position.x += dir.x* CONST.palyerV;
-        this.mesh.position.y += dir.y* CONST.palyerV;
+        this.mesh.position.x += dir.x* CONST.playerV;
+        this.mesh.position.y += dir.y* CONST.playerV;
 		this.position.x = this.mesh.position.x;
 		this.position.y = this.mesh.position.y;
 	}

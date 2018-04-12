@@ -7,5 +7,6 @@ export default {
 	},
 	gridCount: 200,
 	enemyV: 0.005,
-	palyerV: 0.009,
+	playerV: 0.012,
+	playerSize: 0.7
 }
