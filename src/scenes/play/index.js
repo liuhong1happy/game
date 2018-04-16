@@ -1,6 +1,5 @@
-import * as THREE from 'three'
 import player from '../../scripts/models/player'
-import CONST from '../../scripts/consts'
+import CONST from '../../scripts/consts/index'
 
 import Scene from '../scene'
 import DebugUIController from '../../scripts/controllers/DebugUIController';

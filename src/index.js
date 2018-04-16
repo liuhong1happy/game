@@ -1,8 +1,9 @@
 import './styles/index.less'
-import * as THREE from 'three'
-import currentScene from './router'
 // polyfill
-window.THREE = THREE; 
+window.THREE = require('three'); 
+var currentScene = require('./router').default
+
+// import currentScene from './router'
 
 function init() {
     const renderer = new THREE.WebGLRenderer( { antialias: true } );

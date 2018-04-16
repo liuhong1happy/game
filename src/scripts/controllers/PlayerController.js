@@ -1,6 +1,5 @@
-import * as THREE from 'three'
 import player from '../models/player'
-import CONST from '../consts'
+import CONST from '../consts/index'
 
 // 绘制路径
 function pathGeometry(path) {

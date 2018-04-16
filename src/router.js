@@ -1,9 +1,7 @@
 
-import HomeScene from './scenes/home'
-import LoadingScene from './scenes/loading'
-import PlayScene from './scenes/play'
-
-import * as THREE from 'three';
+import HomeScene from './scenes/home/index'
+import LoadingScene from './scenes/loading/index'
+import PlayScene from './scenes/play/index'
 import Scene from './scenes/scene';
 
 // 路由配置

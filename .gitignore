@@ -1,2 +1,8 @@
 node_modules/
 package-lock.json
+three/src/
+three/examples/
+three/LICENSE
+three/README.md
+three/bower.json
+three/package.json
