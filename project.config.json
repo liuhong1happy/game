@@ -9,9 +9,25 @@
 	},
 	"compileType": "game",
 	"libVersion": "1.9.94",
-	"appid": "wxef0d6eb6bdc86ab4",
-	"projectname": "%E5%9C%88%E5%9C%B0%E6%B8%B8%E6%88%8F2",
+	"appid": "wx31a22e560c4a55c4",
+	"projectname": "%E5%9C%88%E5%9C%B0%E6%B8%B8%E6%88%8F1",
 	"isGameTourist": false,
+	"packOptions": {
+		"ignore": [
+			{
+				"type": "file",
+				"value": "src/index.js"
+			},
+			{
+				"type": "folder",
+				"value": "docs"
+			},
+			{
+				"type": "suffix",
+				"value": ".html"
+			}
+		]
+	},
 	"condition": {
 		"search": {
 			"current": -1,
