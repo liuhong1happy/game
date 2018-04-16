@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import player from '../models/player'
 import CONST from '../consts'
 
-
+// 绘制路径
 function pathGeometry(path) {
 	var geometry = new THREE.BufferGeometry();
 	var position = [];
@@ -34,7 +34,9 @@ export default class PlayerController {
     path = [{x:0,y:0,z:0.01}];
     // 所有围成的区域
 	areas = [];
-    blocks = [];
+	// 围成区域的所有区块
+	blocks = [];
+	// 初始化
     init() {
         // 初始化网格
         var grid = new THREE.GridHelper( CONST.gridCount, CONST.gridCount, 0xffffff, 0x555555 );
@@ -46,9 +48,11 @@ export default class PlayerController {
         this.mesh = new THREE.Mesh( geometry, material );
         this.mesh.position.z = CONST.playerSize / 2;
         this.scene.add(this.mesh);
-    }
+	}
+	// 添加区块
 	addBlocks(blocks) {
 		var canInsertBlocks = [];
+		// 判断原来的区块是否和现在生成的区块重叠
 		this.blocks.forEach(function(oldBlock) {
 			var index = blocks.findIndex(function(newBlock) { return newBlock.point1.x === oldBlock.point1.x && newBlock.point1.y === oldBlock.point1.y });
 			if(index!==-1) blocks.splice(index, 1);
@@ -56,6 +60,7 @@ export default class PlayerController {
 		this.blocks = this.blocks.concat(blocks);
 		console.log('this.blocks', this.blocks);
 	}
+	// 添加区域
 	addArea(points) {
 		// 加入区域
 		var area = {
@@ -103,6 +108,7 @@ export default class PlayerController {
 		this.addBlocks(blocks);
 		this.areas.push(area);
 	}
+	// 绘制区域
 	drawArea(){
 		const newAreas = this.areas.filter(function(area){ return area.mesh === null; });
 		newAreas.forEach((area) => {
@@ -117,6 +123,7 @@ export default class PlayerController {
 			this.scene.add(area.mesh);
 		})
 	}
+	// 位置相关计算
 	calculate() {
 		// 计算是否有一格的距离
 		var distance = Math.sqrt(Math.pow(player.position.x - this.position.x, 2) + Math.pow(player.position.y - this.position.y, 2))
@@ -174,6 +181,7 @@ export default class PlayerController {
 
 		}
 	}
+	// 随机变化方向
 	random() {
 		var dirDic = {
 			'w': ['w','a','d'],
@@ -186,16 +194,19 @@ export default class PlayerController {
 		var dir = dirDic[this.direction][rdmInt];
 		this.direction = dir;
 	}
+	// 获取手势方向，获取完毕重置为c
 	gestureDirection() {
 		if(this.gesture.direction !== 'c') {
 			this.direction = this.gesture.direction;
 			this.gesture.direction = 'c';
 		}
 	}
+	// 更新玩家信息
 	applyMesh() {
 		this.mesh.position.x = this.position.x;
 		this.mesh.position.y = this.position.y;
 	}
+	// 更新相机信息
 	applyCamera() {
 		this.camera.position.x = this.position.x-15;
 		this.camera.position.y = this.position.y-15;
@@ -203,6 +214,7 @@ export default class PlayerController {
 		this.camera.up = new THREE.Vector3(0.5, 0.5, 0)
 		this.camera.lookAt( this.position.x, this.position.y, 0 );
 	}
+	// 更新位置信息
 	update() {
         var dir = CONST.direction[player.direction];
         this.mesh.position.x += dir.x* CONST.playerV;
@@ -210,6 +222,7 @@ export default class PlayerController {
 		this.position.x = this.mesh.position.x;
 		this.position.y = this.mesh.position.y;
 	}
+	// 绘制行驶路径
 	drawPath() {
 		if(this.path.length>1) {
 			if(!this.pathMesh) {
@@ -235,6 +248,7 @@ export default class PlayerController {
 	distance(position) {
 		return Math.sqrt(Math.pow(this.position.x - position.x, 2) + Math.pow(this.position.y - position.y, 2))
 	}
+	// 判断位置是否在行驶路径上
 	outPath(position) {
 		return this.path.filter(function(point) {
 			return (point.x === position.x && point.y === position.y)
