@@ -1,20 +1,19 @@
 import './styles/index.less'
 // polyfill
 window.THREE = require('three'); 
-var currentScene = require('./router').default
+var _history = require('./router').default
 
 // import currentScene from './router'
 
 function init() {
-    const renderer = new THREE.WebGLRenderer( { antialias: true } );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
-    currentScene.Init(renderer)
+    var canvas = document.createElement('canvas');
+    _history.current.scene.Init(canvas)
+    document.body.appendChild(canvas);
 }
 
 function animate() {
     requestAnimationFrame( animate );
-    currentScene.Render();
+    _history.current.scene.Render();
 }
 // 初始化
 init();

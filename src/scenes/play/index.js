@@ -1,13 +1,13 @@
 import player from '../../scripts/models/player'
 import CONST from '../../scripts/consts/index'
 
-import Scene from '../scene'
 import DebugUIController from '../../scripts/controllers/DebugUIController';
 import PlayerController from '../../scripts/controllers/PlayerController';
 import EnemyController from '../../scripts/controllers/EnemyController';
 import GestureController from '../../scripts/controllers/GestureController';
+import WebGLScene from '../webglScene';
 
-export default class PlayScene extends Scene {
+export default class PlayScene extends WebGLScene {
     Start() {
         var aspect = window.innerWidth / window.innerHeight;
         var width = 10*aspect, height = 10;
