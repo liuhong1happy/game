@@ -1,20 +1,16 @@
 
 import HomeScene from './scenes/home/index'
 import LoadingScene from './scenes/loading/index'
+
 import PlayScene from './scenes/play/index'
 import Scene from './scenes/scene';
+import _history from './scenes/history';
 
-// 路由配置
-const scenes = {
-    '/home': new HomeScene(),
-    '/loading': new LoadingScene(),
-    '/play': new PlayScene(),
-    '/404': new Scene()
-}
+_history.init();
+_history.addRoute('/home', new HomeScene());
+_history.addRoute('/loading', new LoadingScene());
+_history.addRoute('/play', new PlayScene());
 
-const currentScene = scenes['/play'];
+_history.push('/loading', { first: true });
 
-export default currentScene;
-
-
-
+export default _history;
