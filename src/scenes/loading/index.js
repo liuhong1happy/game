@@ -8,7 +8,7 @@ export default class LoadingScene extends Scene {
         this.context.fillRect(0,0, window.innerWidth, window.innerHeight)
     }
     Update() {
-        this.precent += Math.random()*0.1;
+        this.precent += Math.random()*0.4;
         if(this.precent>= 100) {
             this.precent = 100;
             _history.push('/play', {})

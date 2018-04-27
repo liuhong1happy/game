@@ -23,20 +23,24 @@ export default class PlayerController {
         this.scene = scene;
 		this.camera = camera;
 		this.gesture = gesture;
-    }
+	}
+	
+	initData() {
+		// 所有围成的区域
+		this.areas = [];
+		this.direction = 'w';
+		this.position = {
+			x: 0,
+			y: 0
+		};
+		this.path = [{x:0,y:0,z:0.01}];
+		// 围成区域的所有区块
+		this.blocks = [];
+	}
 
-    direction = 'w';
-	position = {
-		x: 0,
-		y: 0
-	};
-    path = [{x:0,y:0,z:0.01}];
-    // 所有围成的区域
-	areas = [];
-	// 围成区域的所有区块
-	blocks = [];
 	// 初始化
     init() {
+		this.initData();
         // 初始化网格
         var grid = new THREE.GridHelper( CONST.gridCount, CONST.gridCount, 0xffffff, 0x555555 );
         grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
@@ -248,9 +252,19 @@ export default class PlayerController {
 		return Math.sqrt(Math.pow(this.position.x - position.x, 2) + Math.pow(this.position.y - position.y, 2))
 	}
 	// 判断位置是否在行驶路径上
-	outPath(position) {
+	outPath(position, distance = 0) {
 		return this.path.filter(function(point) {
-			return (point.x === position.x && point.y === position.y)
+			var dx = point.x - position.x;
+			var dy = point.y - position.y;
+			return (dx <= distance && dy <= distance)
 		}).length === 0;
+	}
+
+	detection() {
+		// 1. 超出游戏界限
+
+		// 2. 其它...
+
+		return false;
 	}
 }

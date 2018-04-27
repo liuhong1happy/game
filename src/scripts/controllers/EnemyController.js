@@ -8,29 +8,31 @@ export default class EnemyController {
         this.camera = camera;
         this.playerController = playerController;
     }
+	init() {
+		this.max = 20; // 敌人数量最多100个
+		this.born = 1*1000; // 1s 诞生一个敌人
+		this.timestamp = Date.now();
+		this.enemies = [ // 记录当前所有敌人
+			{
+				typeId: 1, // 预留字段,怪物类型
+				direction: 'd',
+				position: {
+					x: 10,
+					y: 10
+				},
+				targetPosition: {
+					x: 11,
+					y: 10
+				},
+				prevPosition: {
+					x: 10,
+					y: 10
+				},
+				mesh: null
+			}
+		];
+	}
 
-    max = 20; // 敌人数量最多100个
-	born = 1*1000; // 1s 诞生一个敌人
-	timestamp = Date.now();
-	enemies = [ // 记录当前所有敌人
-		{
-			typeId: 1, // 预留字段,怪物类型
-			direction: 'd',
-			position: {
-				x: 10,
-				y: 10
-			},
-			targetPosition: {
-				x: 11,
-				y: 10
-			},
-			prevPosition: {
-				x: 10,
-				y: 10
-			},
-			mesh: null
-		}
-	];
 	random(direction) {
 		var dirDic = {
 			'w': ['w','a','d'],
@@ -148,8 +150,26 @@ export default class EnemyController {
 		})
 		
 	}
+	
 	// 判断某一点是否有怪物活动
 	outEnemy(position) {
 		return this.enemies.filter(function(enemy) { return enemy.targetPosition.x === position.x && enemy.targetPosition.y === position.y }).length===0
+	}
+	detection() {
+		return this.enemies.filter((enemy)=> {
+			// 1. 判断怪物是否撞到玩家
+			var distance = this.playerController.distance(enemy.position);
+			if(distance<= 0.1) {
+				alert('怪物撞到玩家')
+				return true;
+			}
+			// 2. 判断怪物是否撞到行驶路线上
+			var isOut = this.playerController.outPath(enemy.position, 0.1);
+			if(isOut) {
+				alert('怪物撞到玩家行驶路径')
+				return true;
+			}
+			return false;
+		}).length > 0;
 	}
 }

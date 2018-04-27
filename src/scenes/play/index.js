@@ -6,6 +6,7 @@ import PlayerController from '../../scripts/controllers/PlayerController';
 import EnemyController from '../../scripts/controllers/EnemyController';
 import GestureController from '../../scripts/controllers/GestureController';
 import WebGLScene from '../webglScene';
+import _history from '../../router'
 
 export default class PlayScene extends WebGLScene {
     Start() {
@@ -21,10 +22,13 @@ export default class PlayScene extends WebGLScene {
         this.uiController = new DebugUIController(this.playerController, this.enemyController,  this.gestureController); // 调试界面显示
 
         this.playerController.init();
+        this.enemyController.init();
         this.uiController.init();
         this.gestureController.init();
+        this.gameOver = false;
     }
     Update() {
+        if(this.gameOver) return;
         // 根据物体位置，更新控制器坐标
         this.playerController.update();
         // 相关计算
@@ -42,7 +46,19 @@ export default class PlayScene extends WebGLScene {
         // 更新ui
         this.uiController.update();
         // 碰撞检测
-
+        if(this.enemyController.detection()) {
+            // Game Over
+            alert('Game Over')
+            this.gameOver = true;
+            _history.reset('/home')
+            return;
+        }
+        if(this.playerController.detection()) {
+            // Game Over
+            this.gameOver = true;
+            _history.reset('/home')
+            return;
+        }
     }
     End() {
         this.gestureController.unload();

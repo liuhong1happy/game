@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Anim</title>
+    <style>
+        body { font-family: Arial; color: #ff6a00; background-color: #000; margin: 0px; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <script src="/three/build/three.min.js"></script>
+    <script src="/three/build/OrbitControls.js"></script>
+    <script src="/three/build/JDLoader.min.js"></script>
+    <script>
+        var meshes = [], mixers = [], hemisphereLight, pointLight, camera, scene, renderer, controls;
+        var clock = new THREE.Clock;
+
+        init();
+        animate();
+
+        function init()
+        {
+            container = document.createElement('div');
+            document.body.appendChild(container);
+            scene = new THREE.Scene();
+            scene.add(new THREE.AmbientLight(0xffffff, 1));
+
+            // var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+            // scene.add( light );
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            window.addEventListener('resize', onWindowResize, false);
+
+            var loader = new THREE.JDLoader();
+            loader.load("ds.jd", 
+                        function (data)
+                        {                            
+                            for (var i = 0; i < data.objects.length; ++i)
+                            {
+                                if (data.objects[i].type == "Mesh" || data.objects[i].type == "SkinnedMesh")
+                                {
+                                    var mesh = null;
+                                    var matArray = createMaterials(data);
+                                    if (data.objects[i].type == "SkinnedMesh")
+                                    {
+                                        mesh = new THREE.SkinnedMesh(data.objects[i].geometry, matArray);
+                                    }
+                                    else // Mesh
+                                    {
+                                        mesh = new THREE.Mesh(data.objects[i].geometry, matArray);
+                                    }
+                                    meshes.push(mesh);
+                                    scene.add(mesh);
+
+
+                                    if (mesh && mesh.geometry.animations)
+                                    {
+                                        var mixer = new THREE.AnimationMixer(mesh);
+                                        mixers.push(mixer);
+                                        var action = mixer.clipAction( mesh.geometry.animations[0] );
+                                        action.play();
+                                    }
+                                }
+                                else if (data.objects[i].type == "Line")
+                                {
+                                    var jd_color = data.objects[i].jd_object.color;
+                                    var color1 = new THREE.Color( jd_color[0] / 255, jd_color[1] / 255, jd_color[2] / 255 );
+                                    var material = new THREE.LineBasicMaterial({ color: color1}); //{ color: new THREE.Color( 0xff0000 ) }
+                                    var line = new THREE.Line(data.objects[i].geometry, material);
+                                    scene.add(line);
+
+                                    if (line.geometry.animations)
+                                    {                                        
+                                        var mixer = new THREE.AnimationMixer(line);
+                                        mixers.push(mixer);                                        
+                                        var action = mixer.clipAction(line.geometry.animations[0]);
+                                        action.play();
+                                    }
+                                }
+                            }
+
+                            var near = 1, far = 10 * data.boundingSphere.radius;
+                            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, near, far);
+                            camera.position.z = data.boundingSphere.center.z + 2.5 * data.boundingSphere.radius;
+                            camera.lookAt(data.boundingSphere.center);
+                            camera.add(new THREE.DirectionalLight(0xFFFFFF, 1));                          
+                            scene.add(camera);
+
+                            if (!controls)
+                               controls = new THREE.OrbitControls(camera, renderer.domElement);
+                            controls.target.copy(data.boundingSphere.center);
+                        });
+
+        }
+
+        function createMaterials(data)
+        {
+            var matArray = [];
+            for (var j = 0; j < data.materials.length; ++j)
+            {
+                var mat = new THREE.MeshPhongMaterial({});
+                mat.copy(data.materials[j]);
+                //mat.transparent = true;
+                matArray.push(mat);
+            }
+            return matArray;
+        }
+
+        function animate()
+        {
+            var delta = clock.getDelta();
+            for (var i = 0; i < mixers.length; ++i)
+                mixers[i].update(delta);
+
+            if (controls) controls.update();
+
+            if (camera)  renderer.render(scene, camera);
+
+            requestAnimationFrame(animate);
+        }
+
+        function onWindowResize()
+        {
+            if (camera)
+            {
+              camera.aspect = window.innerWidth / window.innerHeight;
+              camera.updateProjectionMatrix();
+            }
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+    </script>
+</body>
+</html>
