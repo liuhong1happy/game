@@ -36,7 +36,7 @@
             window.addEventListener('resize', onWindowResize, false);
 
             var loader = new THREE.JDLoader();
-            loader.load("ds.jd", 
+            loader.load("hero.jd", 
                         function (data)
                         {                            
                             for (var i = 0; i < data.objects.length; ++i)
@@ -55,13 +55,15 @@
                                     }
                                     meshes.push(mesh);
                                     scene.add(mesh);
-
+                                    var helper = new THREE.SkeletonHelper( mesh );
+                                    helper.material.linewidth = 3;
+                                    scene.add( helper );
 
                                     if (mesh && mesh.geometry.animations)
                                     {
                                         var mixer = new THREE.AnimationMixer(mesh);
                                         mixers.push(mixer);
-                                        var action = mixer.clipAction( mesh.geometry.animations[0] );
+                                        var action = mixer.clipAction( mesh.geometry.animations[1] );
                                         action.play();
                                     }
                                 }
