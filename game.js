@@ -1,6 +1,7 @@
 require('./weapp-adapter')
 
 GameGlobal.THREE = require('./three/build/three.min')
+require('./three/build/JDLoader.min.js')
 var _history = require('./src/router').default
 
 function init() {

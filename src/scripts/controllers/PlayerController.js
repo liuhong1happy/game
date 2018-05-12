@@ -1,5 +1,6 @@
 import player from '../models/player'
 import CONST from '../consts/index'
+import Hero from '../models/Hero';
 
 // 绘制路径
 function pathGeometry(path) {
@@ -45,12 +46,16 @@ export default class PlayerController {
         var grid = new THREE.GridHelper( CONST.gridCount, CONST.gridCount, 0xffffff, 0x555555 );
         grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
         this.scene.add( grid );
-        // 初始化玩家mesh
-        var geometry = new THREE.BoxGeometry( CONST.playerSize, CONST.playerSize, CONST.playerSize );
-        var material = new THREE.MeshNormalMaterial();
-        this.mesh = new THREE.Mesh( geometry, material );
-        this.mesh.position.z = CONST.playerSize / 2;
-        this.scene.add(this.mesh);
+		// 初始化玩家mesh
+		this.hero = new Hero(this.scene, this.camera);
+		this.hero.preload('../../../src/assets/男主/nanzhu.JD');
+		this.hero.born(new THREE.Vector3(0,0, CONST.playerSize / 2))
+
+        // var geometry = new THREE.BoxGeometry( CONST.playerSize, CONST.playerSize, CONST.playerSize );
+        // var material = new THREE.MeshNormalMaterial();
+        // this.mesh = new THREE.Mesh( geometry, material );
+        // this.mesh.position.z = CONST.playerSize / 2;
+        // this.scene.add(this.mesh);
 	}
 	// 添加区块
 	addBlocks(blocks) {
@@ -206,8 +211,10 @@ export default class PlayerController {
 	}
 	// 更新玩家信息
 	applyMesh() {
-		this.mesh.position.x = this.position.x;
-		this.mesh.position.y = this.position.y;
+		if(this.hero.meshes) {
+			this.hero.meshes.position.x = this.position.x;
+			this.hero.meshes.position.y = this.position.y;
+		}
 	}
 	// 更新相机信息
 	applyCamera() {
@@ -219,11 +226,14 @@ export default class PlayerController {
 	}
 	// 更新位置信息
 	update() {
-        var dir = CONST.direction[player.direction];
-        this.mesh.position.x += dir.x* CONST.playerV;
-        this.mesh.position.y += dir.y* CONST.playerV;
-		this.position.x = this.mesh.position.x;
-		this.position.y = this.mesh.position.y;
+		if(this.hero.meshes) {
+			var dir = CONST.direction[player.direction];
+			this.hero.meshes.position.x += dir.x* CONST.playerV;
+			this.hero.meshes.position.y += dir.y* CONST.playerV;
+			this.position.x = this.hero.meshes.position.x;
+			this.position.y = this.hero.meshes.position.y;
+			this.hero.update(player.direction)
+		}
 	}
 	// 绘制行驶路径
 	drawPath() {
@@ -253,9 +263,10 @@ export default class PlayerController {
 	}
 	// 判断位置是否在行驶路径上
 	outPath(position, distance = 0) {
+		if(this.path.length <= 1) return true;
 		return this.path.filter(function(point) {
-			var dx = point.x - position.x;
-			var dy = point.y - position.y;
+			var dx = Math.abs(point.x - position.x);
+			var dy = Math.abs(point.y - position.y);
 			return (dx <= distance && dy <= distance)
 		}).length === 0;
 	}

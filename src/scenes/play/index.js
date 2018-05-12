@@ -15,6 +15,8 @@ export default class PlayScene extends WebGLScene {
         // 更新相机和相机位置
         this.camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 100 );
         this.camera.position.z = 10;
+        this.scene.add(new THREE.AmbientLight(0xffffff, 1));
+        
         // 初始化控制器
         this.gestureController = new GestureController(); // 手势控制器
         this.playerController = new PlayerController(this.scene, this.camera, this.gestureController); // 玩家控制器

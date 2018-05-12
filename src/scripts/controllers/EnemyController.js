@@ -165,7 +165,7 @@ export default class EnemyController {
 			}
 			// 2. 判断怪物是否撞到行驶路线上
 			var isOut = this.playerController.outPath(enemy.position, 0.1);
-			if(isOut) {
+			if(!isOut) {
 				alert('怪物撞到玩家行驶路径')
 				return true;
 			}

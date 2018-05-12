@@ -1,6 +1,7 @@
 import './styles/index.less'
 // polyfill
 window.THREE = require('three'); 
+require('../three/build/JDLoader.min.js')
 var _history = require('./router').default
 
 // import currentScene from './router'
