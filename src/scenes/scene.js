@@ -7,7 +7,7 @@ export default class Scene {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.context = canvas.getContext('2d', { antialias: true });
-        this.context.clearRect(0,0,window.innerWidth, window.innerHeight)
+        this.context.clearRect(0,0,window.innerWidth, window.innerHeight);
         this.Start(canvas);
     }
     Start() {
