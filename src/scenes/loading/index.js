@@ -1,5 +1,5 @@
-import Scene from '../scene'
-import _history from '../history'
+import Scene from '../../core/scenes/scene'
+import _history from '../../core/route/history'
 
 export default class LoadingScene extends Scene {
     Start() {
@@ -8,7 +8,7 @@ export default class LoadingScene extends Scene {
         this.context.fillRect(0,0, window.innerWidth, window.innerHeight)
     }
     Update() {
-        this.precent += Math.random()*0.8;
+        this.precent += Math.random()*1;
         if(this.precent>= 100) {
             this.precent = 100;
         }
