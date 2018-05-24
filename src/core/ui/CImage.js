@@ -1,8 +1,8 @@
-import BaseComponent from "./BaseComponent";
+import Component from "./Component";
 /**
  * 图片组件
  */
-export default class CImage extends BaseComponent {
+export default class CImage extends Component {
     /**
      * 图片组件构造函数
      * @param {string} source 
@@ -16,6 +16,7 @@ export default class CImage extends BaseComponent {
         this.source = source;
         // 回调函数
         this.callback = callback;
+        this.isCImage = true;
     }
     /** 重新设置图片资源路径 */
     setSource(source, callback = false) {

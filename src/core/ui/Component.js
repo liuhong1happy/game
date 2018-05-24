@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
 
-export default class BaseComponent {
+export default class Component {
     constructor() {
         this.x = 0;
         this.y = 0;
@@ -11,6 +11,7 @@ export default class BaseComponent {
         this.touchable = false; // 组件是否接受触屏事件
         this.touched = false; // 是否触摸到组件
         this.eventEmitter = new EventEmitter(); // 事件触发器
+        this.isComponent = true;
     }
     setPosition(x, y) {
         this.x = x;

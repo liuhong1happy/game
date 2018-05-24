@@ -1,6 +1,6 @@
-import BaseComponent from "./BaseComponent";
+import Component from "./Component";
 
-export default class CText extends BaseComponent {
+export default class CText extends Component {
 
     constructor(text) {
         super()
@@ -15,6 +15,8 @@ export default class CText extends BaseComponent {
         this._x = 0;
         this._y = 0;
         this._font = this.fontSize +"px " + this.fontFamily;
+
+        this.isCText = true;
     }
 
     setContent(text) {
