@@ -57,7 +57,6 @@ export default class CText extends BaseComponent {
                 this._y = this.y;
                 break;
         }
-
     }
 
     Update() {
