@@ -25,6 +25,7 @@ export default class WebGLScene extends Scene {
         if(this.renderer)
             this.renderer.render( this.scene, this.camera );
         this.context.drawImage(this.renderer.domElement, 0, 0)
+        super.Render();
     }
     Update() {
         // 允许被替换覆写

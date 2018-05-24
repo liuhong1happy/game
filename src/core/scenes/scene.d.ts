@@ -1,17 +1,12 @@
-export default class WebGLScene extends Scene {
-    /** 3D场景 */
-    protected scene: THREE.Scene;
-    /** 3D相机 */
-    protected camera: THREE.Camera;
-    /** 3D渲染器 */
-    protected renderer: THREE.Renderer;
-    /** 窗口大小变化 */
-    private onWindowResize():void
+import BaseComponent from "../ui/BaseComponent";
 
+export default class Scene {
     /** 2D场景 */
     protected canvas: HTMLCanvasElement;
     /** 2D绘制上下文 */
     protected context: CanvasRenderingContext2D;
+    /** 子元素 */
+    protected children: Array<BaseComponent>;
     /** 构造函数，初始化相机和场景 */
     constructor()
     /** 初始化场景 */
@@ -26,4 +21,6 @@ export default class WebGLScene extends Scene {
     public Unload():void
     /** 离开场景 */
     protected End():void
+    /** 渲染组件 */
+    protected updateChildren():void
 }

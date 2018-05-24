@@ -1,4 +1,4 @@
-import Scene from "./scene";
+import Scene from "../scenes/scene";
 
 export default {
     current: { path: '/404', params: {}, scene: new Scene() },

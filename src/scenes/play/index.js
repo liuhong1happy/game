@@ -1,3 +1,6 @@
+import WebGLScene from '../../core/scenes/webglScene'
+import _history from '../../core/route/history'
+
 import player from '../../scripts/models/player'
 import CONST from '../../scripts/consts/index'
 
@@ -5,8 +8,6 @@ import DebugUIController from '../../scripts/controllers/DebugUIController';
 import PlayerController from '../../scripts/controllers/PlayerController';
 import EnemyController from '../../scripts/controllers/EnemyController';
 import GestureController from '../../scripts/controllers/GestureController';
-import WebGLScene from '../webglScene';
-import _history from '../../router'
 
 export default class PlayScene extends WebGLScene {
     Start() {
