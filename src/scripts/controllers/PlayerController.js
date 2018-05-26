@@ -1,6 +1,7 @@
 import player from '../models/player'
 import CONST from '../consts/index'
 import Hero from '../models/Hero';
+import GridPlane from '../utils/GridPlane';
 
 // 绘制路径
 function pathGeometry(path) {
@@ -42,10 +43,13 @@ export default class PlayerController {
 	// 初始化
     init() {
 		this.initData();
-        // 初始化网格
-        var grid = new THREE.GridHelper( CONST.gridCount, CONST.gridCount, 0xffffff, 0x555555 );
-        grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
-        this.scene.add( grid );
+		// 初始化网格
+		var material1 = new THREE.MeshPhongMaterial( { side: THREE.DoubleSide, map: THREE.ImageUtils.loadTexture('../../../src/assets/images/qt/db_1.png') } );
+		var material2 = new THREE.MeshPhongMaterial( { side: THREE.DoubleSide, map: THREE.ImageUtils.loadTexture('../../../src/assets/images/qt/db_2.png') } );
+
+        this.gridPlane = new GridPlane( CONST.gridCount, CONST.gridCount, material1, material2 );
+        this.gridPlane.mesh.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
+        this.scene.add( this.gridPlane.mesh );
 		// 初始化玩家mesh
 		this.hero = new Hero(this.scene, this.camera);
 		this.hero.preload('../../../src/assets/男主/nanzhu.JD');
@@ -66,7 +70,8 @@ export default class PlayerController {
 			if(index!==-1) blocks.splice(index, 1);
 		})
 		this.blocks = this.blocks.concat(blocks);
-		console.log('this.blocks', this.blocks);
+		this.gridPlane.updateFaceIndex(this.blocks.map(block=> block.point1));
+		// console.log('this.blocks', this.blocks, this.gridPlane.mesh.geometry);
 	}
 	// 添加区域
 	addArea(points) {
@@ -118,18 +123,18 @@ export default class PlayerController {
 	}
 	// 绘制区域
 	drawArea(){
-		const newAreas = this.areas.filter(function(area){ return area.mesh === null; });
-		newAreas.forEach((area) => {
-			var shape = new THREE.Shape();
-			area.points.forEach(function(point, index) {
-				index === 0 ? shape.moveTo(point.x, point.y) : shape.lineTo(point.x, point.y)
-			})
-			var geometry = new THREE.ShapeGeometry( shape );
-			var material = new THREE.MeshBasicMaterial( { color: 0xFFE69A } );
-			area.mesh = new THREE.Mesh( geometry, material ) ;
-			area.mesh.position.set(0,0,0.02);
-			this.scene.add(area.mesh);
-		})
+		// const newAreas = this.areas.filter(function(area){ return area.mesh === null; });
+		// newAreas.forEach((area) => {
+		// 	var shape = new THREE.Shape();
+		// 	area.points.forEach(function(point, index) {
+		// 		index === 0 ? shape.moveTo(point.x, point.y) : shape.lineTo(point.x, point.y)
+		// 	})
+		// 	var geometry = new THREE.ShapeGeometry( shape );
+		// 	var material = new THREE.MeshBasicMaterial( { color: 0xFFE69A } );
+		// 	area.mesh = new THREE.Mesh( geometry, material ) ;
+		// 	area.mesh.position.set(0,0,0.02);
+		// 	this.scene.add(area.mesh);
+		// })
 	}
 	// 位置相关计算
 	calculate() {

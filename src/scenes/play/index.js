@@ -15,10 +15,12 @@ import CToggleButton from '../../core/ui/CToggleButton';
 
 export default class PlayScene extends WebGLScene {
     Start() {
+        this.paused = false;
         this.Init3D()
         this.Init2D()
     }
     Update() {
+        if(this.paused) return;
         if(this.gameOver) return;
         // 根据物体位置，更新控制器坐标
         this.playerController.update();
@@ -111,29 +113,31 @@ export default class PlayScene extends WebGLScene {
 
 
         // 暂停和开始
+        var scale = 0.88;
         this.ksImage = new CImage('../../../src/assets/images/qt/ks.png'); 
-        this.ksImage.setSize(23, 26.5);
+        this.ksImage.setSize(23*scale, 26.5*scale);
 
         this.ztImage = new CImage('../../../src/assets/images/qt/zt.png'); 
-        this.ztImage.setSize(23, 26.5);
+        this.ztImage.setSize(23*scale, 26.5*scale);
         
         this.ksLayout = new CLayout();
         this.ksLayout.setPosition(window.innerWidth - 40, 0)
-        this.ksLayout.setSize(40, 30)
+        this.ksLayout.setSize(40, 40)
 
-        this.ksLayout.children.push(this.ksImage)
+        this.ksLayout.children.push(this.ztImage)
 
         this.toggleButton = new CToggleButton();
         this.toggleButton.setPosition(window.innerWidth - 40, 0)
-        this.toggleButton.setSize(40, 30)
+        this.toggleButton.setSize(40, 40)
         this.toggleButton.background = this.ksLayout;
-        this.toggleButton.setToggle(true);
+        this.toggleButton.setToggle(false);
         this.toggleButton.addEventListener('change', (toggle)=>{
             if(toggle) {
                 this.ksLayout.children[0] = this.ksImage;
             } else {
                 this.ksLayout.children[0] = this.ztImage;
             }
+            this.paused = toggle;
         })
         this.children.push(this.toggleButton)
     }

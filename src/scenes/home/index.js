@@ -38,7 +38,7 @@ export default class HomeScene extends Scene {
         this.phbText.color = 'white';
         this.children.push(this.phbText)
 
-        var hosanWidth = 105
+        var hosanWidth = 105;
         var hosanHeight = 36;
         this.hosanImage = new CImage('../../../src/assets/images/qt/hosan.png'); 
         this.hosanImage.setPosition(window.innerWidth / 2 - hosanWidth /2, window.innerHeight - 140);
