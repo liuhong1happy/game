@@ -68,7 +68,7 @@ export default class CLayout extends Component {
                         break;
                 }
                 child.setPosition(x, y);
-                startX = x + child.width + this.gutter.x;
+                startX = x + child.width + this.gutter.h;
             })
         } else {
             // 计算所有组件的总高度

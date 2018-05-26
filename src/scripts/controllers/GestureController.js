@@ -46,7 +46,7 @@ export default class GestureController {
         var dx = this.endX - this.startX;
         //如果滑动距离太短
         if (Math.abs(dx) < 2 && Math.abs(dy) < 2) {
-           return null;
+           return 'c';
         }
         var angle = this.GetSlideAngle(dx, dy);
         var direction = 'c';

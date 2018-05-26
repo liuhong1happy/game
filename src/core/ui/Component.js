@@ -11,6 +11,7 @@ export default class Component {
         this.touchable = false; // 组件是否接受触屏事件
         this.touched = false; // 是否触摸到组件
         this.eventEmitter = new EventEmitter(); // 事件触发器
+        this.eventEmitter.setMaxListeners(3000);
         this.isComponent = true;
     }
     setPosition(x, y) {

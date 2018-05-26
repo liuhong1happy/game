@@ -15,6 +15,7 @@ export default class WebGLScene extends Scene {
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
         // this.renderer = new THREE.CanvasRenderer( { antialias: true, canvas } );
         this.renderer.setSize( window.innerWidth, window.innerHeight );
+        this.bindEvent();
         this.Start(this.renderer);
     }
     Start() {
@@ -32,6 +33,7 @@ export default class WebGLScene extends Scene {
     }
     Unload() {
         window.removeEventListener( 'resize', this.onWindowResize, false );
+        this.unbindEvent();
         this.End();
     }
     End() {

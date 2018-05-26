@@ -2,6 +2,7 @@ export default class Scene {
     constructor() {
         this.params = {};
         this.touched = false;
+        this.children = [];
     }
     Init(canvas) {
         this.canvas = canvas;
@@ -9,12 +10,8 @@ export default class Scene {
         this.canvas.height = window.innerHeight;
         this.context = canvas.getContext('2d', { antialias: true });
         this.context.clearRect(0,0,window.innerWidth, window.innerHeight);
-        this.children = [];
-
-        this.canvas.addEventListener('touchstart', this.onTouchStart)
-        this.canvas.addEventListener('touchmove', this.onTouchMove)
-        this.canvas.addEventListener('touchend', this.onTouchEnd)
-
+        
+        this.bindEvent();
         this.Start(canvas);
     }
     Start() {
@@ -41,15 +38,25 @@ export default class Scene {
         // 允许被替换覆写
     }
     Unload() {
-        this.canvas.removeEventListener('touchstart', this.onTouchStart)
-        this.canvas.removeEventListener('touchmove', this.onTouchMove)
-        this.canvas.removeEventListener('touchend', this.onTouchEnd)
+        this.unbindEvent();
         this.End();
     }
     End() {
         // 允许被替换覆写
     }
 
+
+    bindEvent() {
+        this.canvas.addEventListener('touchstart', this.onTouchStart)
+        this.canvas.addEventListener('touchmove', this.onTouchMove)
+        this.canvas.addEventListener('touchend', this.onTouchEnd)
+    }
+
+    unbindEvent() {
+        this.canvas.removeEventListener('touchstart', this.onTouchStart)
+        this.canvas.removeEventListener('touchmove', this.onTouchMove)
+        this.canvas.removeEventListener('touchend', this.onTouchEnd)
+    }
 
     onTouchStart = (evt)=> {
         console.log('touchstart', evt);

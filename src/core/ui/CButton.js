@@ -8,7 +8,7 @@ export default class CButton extends Component {
         this.visible = true;
         this.touchable = true;
         this.background = new CRect();
-        this.content = new CText("按钮");
+        this.content = new CText("");
         this.isCButton = true;
     }
     setPosition(x, y) {

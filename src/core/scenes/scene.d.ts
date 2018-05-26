@@ -23,4 +23,8 @@ export default class Scene {
     protected End():void
     /** 渲染组件 */
     protected updateChildren():void
+    /** 绑定事件 */
+    protected bindEvent(): void
+    /** 解绑事件 */
+    protected unbindEvent(): void
 }
