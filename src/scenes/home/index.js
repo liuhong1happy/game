@@ -2,6 +2,8 @@ import Scene from '../../core/scenes/scene'
 import _history from '../../core/route/history'
 import CImage from '../../core/ui/CImage';
 import CText from '../../core/ui/CText';
+import CButton from '../../core/ui/CButton';
+import CLayout from '../../core/ui/CLayout';
 
 export default class HomeScene extends Scene {
     Start() {
@@ -25,6 +27,7 @@ export default class HomeScene extends Scene {
         this.phbImage.setPosition(20, window.innerHeight - 50);
         this.phbImage.setSize(47, 30);
         this.children.push(this.phbImage)
+
         // 排行榜
         this.phbText = new CText('排行榜')
         this.phbText.fontSize = 15;
@@ -35,21 +38,32 @@ export default class HomeScene extends Scene {
         this.phbText.color = 'white';
         this.children.push(this.phbText)
 
-        // 排行榜图片
         var hosanWidth = 105
         var hosanHeight = 36;
         this.hosanImage = new CImage('../../../src/assets/images/qt/hosan.png'); 
         this.hosanImage.setPosition(window.innerWidth / 2 - hosanWidth /2, window.innerHeight - 140);
         this.hosanImage.setSize(hosanWidth, hosanHeight);
-        this.children.push(this.hosanImage)
+        // this.children.push(this.hosanImage)
 
-        // 排行榜图片
         var ksyxWidth = 79
         var ksyxHeight = 20;
         this.ksyxImage = new CImage('../../../src/assets/images/qt/ksyx.png'); 
         this.ksyxImage.setPosition(window.innerWidth / 2 - ksyxWidth /2, window.innerHeight - 140 + (hosanHeight-ksyxHeight)/2);
         this.ksyxImage.setSize(ksyxWidth, ksyxHeight);
-        this.children.push(this.ksyxImage)
+        this.ksyxLayout = new CLayout();
+        this.ksyxLayout.children.push(this.ksyxImage);
+        // this.children.push(this.ksyxImage)
+
+        this.ksyxButton = new CButton();
+        this.ksyxButton.background = this.hosanImage;
+        this.ksyxButton.content = this.ksyxLayout;
+        this.ksyxButton.setPosition(window.innerWidth / 2 - hosanWidth /2, window.innerHeight - 140);
+        this.ksyxButton.setSize(hosanWidth, hosanHeight);
+        this.ksyxButton.addEventListener('touchend', (evt)=>{
+            _history.push('/play')
+        })
+
+        this.children.push(this.ksyxButton)
     }
     Update() {
         // this.context.fillStyle = "white"

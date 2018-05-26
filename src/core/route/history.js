@@ -26,7 +26,7 @@ export default {
         if(findIndex !== -1) {
             let scene = this.scenes[findIndex].scene;
             // 卸载当前场景
-            // this.current.scene.Unload(); 
+            this.current.scene.Unload(); 
             // 初始化新的场景
             scene.Init(this.current.scene.canvas);
             // 保存新的场景

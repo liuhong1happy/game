@@ -4,6 +4,7 @@ import CText from "./CText";
 
 export default class CButton extends Component {
     constructor() {
+        super()
         this.visible = true;
         this.touchable = true;
         this.background = new CRect();
@@ -17,8 +18,8 @@ export default class CButton extends Component {
     }
     setSize(w, h) {
         super.setSize(w, h);
-        this.background.setSize(x, y);
-        this.content.setSize(x, y);
+        this.background.setSize(w, h);
+        this.content.setSize(w, h);
     }
     Start() {
         this.loaded = true;
@@ -26,9 +27,21 @@ export default class CButton extends Component {
 
     Update() {
         if(this.visible && this.loaded) {
-            this.background.Update();
-            this.content.Update();
+            this.updateChildren()
         }
+    }
+
+    updateChildren() {
+        const children = [ this.background, this.content]
+        const visibleChildren = children.filter(child=> child.visible);
+        visibleChildren.forEach(child=>{
+            if(!child.loaded) {
+                child.parent = this;
+                child.context = this.context;
+                child.Start()
+            }
+            else child.Update()
+        })
     }
 
     End() {}

@@ -2,6 +2,7 @@ import Component from "./Component";
 
 export default class CRect extends Component {
     constructor() {
+        super()
         this.visible = true;
         this.backgroundColor = 'black';
         this.isCRect = true;

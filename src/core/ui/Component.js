@@ -65,22 +65,31 @@ export default class Component {
      * @param {Event} evt 
      */
     emitTouchMove(evt) {
-        this.eventEmitter.emit('touchmove', evt);
+        if(this.touchable) {
+            this.eventEmitter.emit('touchmove', evt);
+            console.log('component', 'touchmove', evt)
+        }
     }
     /**
      * 触发TouchStart事件
      * @param {Event} evt 
      */
     emitTouchStart(evt) {
-        this.touched = true;
-        this.eventEmitter.emit('touchstart', evt);
+        if(this.touchable) {
+            this.touched = true;
+            this.eventEmitter.emit('touchstart', evt);
+            console.log('component', 'touchstart', evt)
+        }
     }
     /**
      * 触发TouchEnd事件
      * @param {Event} evt 
      */
     emitTouchEnd(evt) {
-        this.touched = false;
-        this.eventEmitter.emit('touchend', evt);
+        if(this.touchable) {
+            this.touched = false;
+            this.eventEmitter.emit('touchend', evt);
+            console.log('component', 'touchend', evt)
+        }
     }
 }
